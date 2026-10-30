@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>দৈনিক আমাদের কথা - সত্য ও ন্যায়ের পক্ষে</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#b91c1c',
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Hind Siliguri', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen transition-colors duration-300">
+
+    <!-- Top Bar -->
+    <div class="bg-primary text-white py-1 text-xs">
+        <div class="max-w-6xl mx-auto px-4 flex justify-between items-center">
+            <span id="current-date">লোড হচ্ছে...</span>
+            <span>সর্বশেষ আপডেট: স্বয়ংক্রিয় এআই সিস্টেম</span>
+        </div>
+    </div>
+
+    <!-- Header -->
+    <header class="bg-white dark:bg-gray-800 shadow-md border-b dark:border-gray-700">
+        <div class="max-w-6xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center">
+            <h1 class="text-3xl md:text-5xl font-bold tracking-wider text-primary">দৈনিক আমাদের কথা</h1>
+            <button onclick="toggleDarkMode()" class="mt-4 md:mt-0 p-2 rounded-full bg-gray-200 dark:bg-gray-700 text-sm">
+                🌙 / ☀️ মোড পরিবর্তন
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-6xl mx-auto px-4 py-8">
+        <div id="news-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <!-- News items will load here dynamically -->
+            <div class="col-span-full text-center py-12 text-gray-500">
+                খবর লোড হচ্ছে... অনুগ্রহ করে একটু অপেক্ষা করুন।
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-white dark:bg-gray-800 border-t dark:border-gray-700 mt-12 py-6 text-center text-sm text-gray-600 dark:text-gray-400">
+        <p>&copy; ২০২৬ দৈনিক আমাদের কথা | সর্বস্বত্ব সংরক্ষিত</p>
+    </footer>
+
+    <script>
+        // Dark Mode Toggle
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+        if (localStorage.getItem('theme') === 'dark' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        // Bengali Date
+        const options = { year: 'numeric', month: 'long', day: 'numeric', weekday: 'long' };
+        document.getElementById('current-date').innerText = new Date().toLocaleDateString('bn-BD', options);
+
+        // Fetch and Render News from news.json
+        fetch('news.json')
+            .then(res => res.json())
+            .then(data => {
+                const container = document.getElementById('news-container');
+                container.innerHTML = '';
+                data.forEach(news => {
+                    const card = `
+                        <article class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden flex flex-col justify-between border dark:border-gray-700 hover:shadow-lg transition">
+                            <div>
+                                <img src="${news.image}" alt="News Image" class="w-full h-48 object-cover">
+                                <div class="p-4">
+                                    <span class="text-xs bg-red-100 text-primary dark:bg-red-900 dark:text-red-200 px-2 py-1 rounded font-semibold">${news.category}</span>
+                                    <h2 class="text-xl font-bold mt-2 mb-2 leading-snug">${news.title}</h2>
+                                    <p class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">${news.summary}</p>
+                                </div>
+                            </div>
+                            <div class="p-4 border-t dark:border-gray-700 flex justify-between items-center text-xs text-gray-500">
+                                <span>⏱️ ${news.time}</span>
+                                <span>👁️ ${news.views} বার পঠিত</span>
+                            </div>
+                        </article>
+                    `;
+                    container.innerHTML += card;
+                });
+            })
+            .catch(err => {
+                console.error('Error loading news:', err);
+                document.getElementById('news-container').innerHTML = `
+                    <div class="col-span-full text-center py-12 text-red-500">
+                        খবর প্রস্তুত হচ্ছে অথবা news.json ফাইলটি পাওয়া যাচ্ছে না। কিছুক্ষণ পর আবার চেক করুন।
+                    </div>
+                `;
+            });
+    </script>
+</body>
+  </html>
